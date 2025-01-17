@@ -133,7 +133,7 @@
 
     <!-- Навигация -->
     <nav>
-        <a href="#" id="home-link">Главная</a>
+        <a href="#" id="database-link">База данных</a>
     </nav>
 
     <!-- Основной контент -->
@@ -166,13 +166,11 @@
     </footer>
 
     <script>
-        // Переключение между разделами
-        const homeSection = document.getElementById('home-section');
-        const homeLink = document.getElementById('home-link');
-
-        homeLink.addEventListener('click', (e) => {
+        // Открытие базы данных
+        const databaseLink = document.getElementById('database-link');
+        databaseLink.addEventListener('click', (e) => {
             e.preventDefault();
-            homeSection.classList.remove('hidden');
+            window.open('https://virus-signatures.neocities.org', '_blank');
         });
     </script>
 </body>
