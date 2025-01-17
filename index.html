@@ -114,56 +114,6 @@
             background-color: #4a4a6f; /* Подсветка пунктов списка */
         }
 
-        /* Таблица хэшей */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background-color: #2a2a3f;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #3e3e5f;
-        }
-
-        th {
-            background-color: #3a3a5f;
-            color: #ffffff;
-            font-weight: bold;
-        }
-
-        tr:hover {
-            background-color: #3e3e5f;
-        }
-
-        /* Кнопки в базе данных */
-        .button-container {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn:hover {
-            background-color: #0056b3;
-        }
-
         /* Скрытие и отображение разделов */
         .hidden {
             display: none;
@@ -178,13 +128,12 @@
             <p>Исходный код: https://github.com/Open-Soft-Lab/open-antivirus</p>
             <p>Telegram: https://t.me/anarhist_life</p>
             <p>Поддержка: https://t.me/Cloveranar</p>
-            </div>
+        </div>
     </header>
 
     <!-- Навигация -->
     <nav>
         <a href="#" id="home-link">Главная</a>
-        <a href="#" id="hash-database-link">База данных</a>
     </nav>
 
     <!-- Основной контент -->
@@ -192,7 +141,7 @@
         <!-- Секция "Главная" -->
         <section id="home-section">
             <h2>О проекте OPEN-AV</h2>
-            <p>OPEN-AV — Антивирусный сканер с открытым исходным кдом и возможностью загрузки пользовательских баз сигнатур.</p>
+            <p>OPEN-AV — Антивирусный сканер с открытым исходным кодом и возможностью загрузки пользовательских баз сигнатур.</p>
             <h3>Функции</h3>
             <ul>
                 <li>Многоуровневое сканирование (MD5, SHA-1, SHA-256).</li>
@@ -207,27 +156,6 @@
                 <li>Безопасность и конфиденциальность.</li>
             </ul>
         </section>
-
-        <!-- Секция "База хэшей" -->
-        <section id="hash-database-section" class="hidden">
-            <h2>База данных вирусных хэшей</h2>
-            <div class="button-container">
-                <button class="btn" id="showMd5">Показать MD5</button>
-                <button class="btn" id="showSha1">Показать SHA-1</button>
-                <button class="btn" id="showSha256">Показать SHA-256</button>
-                <button class="btn" id="downloadHashes">Скачать хэши в формате JSON</button>
-            </div>
-            <table id="hashTable">
-                <thead>
-                    <tr>
-                        <th>Хэш</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Данные будут добавлены с помощью JavaScript -->
-                </tbody>
-            </table>
-        </section>
     </div>
 
     <!-- Подвал -->
@@ -238,101 +166,14 @@
     </footer>
 
     <script>
-        // Переменная для хранения текущих хэшей
-        let currentHashes = [];
-        let currentMode = 'md5'; // Текущий режим (md5, sha1, sha256)
-
-        // Функция для очистки строки от лишних частей
-        function cleanHash(hash) {
-            return hash
-                .replace('https://', '') // Убираем "https://"
-                .replace('bazaar.abuse.ch/sample/', '') // Убираем "bazaar.abuse.ch/sample/"
-                .replace(/\/$/, ''); // Убираем "/" в конце
-        }
-
-        // Загрузка и отображение хэшей
-        async function loadAndShowHashes(type) {
-            currentMode = type;
-            const response = await fetch(`${type}.txt`); // Загружаем файл
-            const text = await response.text(); // Читаем текст
-            currentHashes = text
-                .trim() // Убираем лишние пробелы
-                .split('\n') // Разделяем по строкам
-                .map(line => line.trim()) // Убираем пробелы вокруг каждой строки
-                .filter(line => line.length > 0); // Убираем пустые строки
-
-            const tbody = document.querySelector('#hashTable tbody');
-            tbody.innerHTML = ''; // Очищаем таблицу перед заполнением
-
-            currentHashes.forEach(hash => {
-                const row = document.createElement('tr');
-                const cell = document.createElement('td');
-
-                if (type === 'sha256') {
-                    // Очищаем строку от лишних частей
-                    const displayText = cleanHash(hash);
-                    if (displayText.length === 64) {
-                        // Если это валидный SHA-256 хэш, создаем ссылку
-                        const link = document.createElement('a');
-                        link.href = `https://bazaar.abuse.ch/sample/${displayText}/`;
-                        link.textContent = displayText;
-                        link.target = '_blank';
-                        cell.appendChild(link);
-                    } else {
-                        // Если это не хэш, а что-то другое, отображаем как текст
-                        cell.textContent = displayText;
-                    }
-                } else {
-                    // Для MD5 и SHA-1 просто текст
-                    cell.textContent = hash;
-                }
-
-                row.appendChild(cell);
-                tbody.appendChild(row);
-            });
-        }
-
-        // Скачивание хэшей в формате JSON
-        document.getElementById('downloadHashes').addEventListener('click', () => {
-            // Очищаем хэши перед сохранением в JSON
-            const cleanedHashes = currentHashes.map(hash => cleanHash(hash));
-            const json = JSON.stringify(cleanedHashes, null, 2); // Преобразуем в JSON
-            const blob = new Blob([json], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${currentMode}_hashes.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        });
-
-        // Обработчики кнопок
-        document.getElementById('showMd5').addEventListener('click', () => loadAndShowHashes('md5'));
-        document.getElementById('showSha1').addEventListener('click', () => loadAndShowHashes('sha1'));
-        document.getElementById('showSha256').addEventListener('click', () => loadAndShowHashes('sha256'));
-
         // Переключение между разделами
         const homeSection = document.getElementById('home-section');
-        const hashSection = document.getElementById('hash-database-section');
         const homeLink = document.getElementById('home-link');
-        const hashLink = document.getElementById('hash-database-link');
 
         homeLink.addEventListener('click', (e) => {
             e.preventDefault();
             homeSection.classList.remove('hidden');
-            hashSection.classList.add('hidden');
         });
-
-        hashLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            homeSection.classList.add('hidden');
-            hashSection.classList.remove('hidden');
-        });
-
-        // Инициализация: загружаем MD5 хэши при загрузке страницы
-        loadAndShowHashes('md5');
     </script>
 </body>
 </html>
